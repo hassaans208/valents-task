@@ -65,13 +65,15 @@ photo (photo is appended in `\App\Models\User`, spatie attaches photo that way)
 </ul>
 
 
-Image of testing CORS Enabled and Rate limiting on a local react project in which I sent 100 requests using setTimeOut, it didn't gave any CORS error and also gave and error after 20 reqyests, it can be seen in the next Image
+I sent 100 requests using setTimeOut, it didn't gave any CORS error
+Gave error after 20 reqyests, it can be seen in the next Image
+Image of testing CORS Enabled and Rate limiting on a local react project is given below
 
 ![Image of testing CORS Enabled and Rate limiting on a local react project in which I sent 100 requests using setTimeOut, it didn't gave any CORS error and also gave and error after 20 reqyests, it can be seen in the next Image](public/images/valents1.png)
 
+Finally the console of this test is attached
 
 ![](public/images/valents2.png)
-
 
 ## Installation
 
@@ -79,14 +81,13 @@ Image of testing CORS Enabled and Rate limiting on a local react project in whic
 
 Run command `composer install`
 
-then `php artisan migrate:fresh --seed`
-
 Copy env.example as env `cp .env.example .env`
 
 Generate a key for the project `php artisan key:generate`
 
-A user with the name is already created with credentials:
+then `php artisan migrate:fresh --seed`
 
+### Seeded User:
 email: admin@gmail.com
 <br />
 password: password

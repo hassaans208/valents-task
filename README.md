@@ -16,6 +16,7 @@ Cors are Enabled
 <li>
 Rate limiting is implemented to 20 requests/minute
 </li>
+<hr />
 <li>
 Tested APIs Postman
 </li>
@@ -36,12 +37,8 @@ Tested
 ![Image of testing CORS Enabled and Rate limiting on a local react project in which I sent 100 requests using setTimeOut, it didn't gave any CORS error and also gave and error after 20 reqyests, it can be seen in the next Image](public/images/valents1.png)
 
 
-![](public/images/valents1.png)
+![](public/images/valents2.png)
 
-A user with the name is already created with credentials:
-
-email: admin@gmail.com
-password: password
 
 ## Installation
 
@@ -55,6 +52,12 @@ Copy env.example as env `cp .env.example .env`
 
 Generate a key for the project `php artisan key:generate`
 
+A user with the name is already created with credentials:
+
+email: admin@gmail.com
+<br />
+password: password
+
 then `php artisan passport:install`
 
 Put the obtained values with the respective key given below
@@ -63,5 +66,5 @@ Put the obtained values with the respective key given below
 PASSPORT_PERSONAL_ACCESS_CLIENT_ID=${clientID}
 PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET=${clientSecretKey}
 </code>
-
+<br />
 Hope the project is fine, Thanks for the opportunity!

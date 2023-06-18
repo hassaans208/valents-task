@@ -1,8 +1,11 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
-Please Read This
-Postman (Documentation): https://documenter.getpostman.com/view/22741474/2s93si2Asg#5ffba680-e62b-41b3-8efd-7b1049d3e94f
+Please Have a look at:
+<a href="https://documenter.getpostman.com/view/22741474/2s93si2Asg#5ffba680-e62b-41b3-8efd-7b1049d3e94f" target="_blank">
+Postman Documentation
+</a>
 
+### Tasks Accomplished:
 <ul>
 <li>
 Created 4 APIs, to list, create, update & delete the user
@@ -11,12 +14,19 @@ Created 4 APIs, to list, create, update & delete the user
 Route for list is unprotected while other routes are protected
 </li>
 <li>
+oauth2 used for user authentication
+</li>
+<li>
 Cors are Enabled
 </li>
 <li>
 Rate limiting is implemented to 20 requests/minute
 </li>
+</ul>
 <hr />
+
+### Provided & Tested:
+<ul>
 <li>
 Tested APIs Postman
 </li>
@@ -33,6 +43,29 @@ Implemented and tested authentication
 Tested 
 </li>
 </ul>
+
+### User Schema:
+<ul>
+<li>
+id
+</li>
+<li>
+first_name
+</li>
+<li>
+last_name</li>
+<li>
+email</li>
+<li>
+password 
+</li>
+<li>
+photo (photo is appended in `\App\Models\User`, spatie attaches photo that way)
+</li>
+</ul>
+
+
+Image of testing CORS Enabled and Rate limiting on a local react project in which I sent 100 requests using setTimeOut, it didn't gave any CORS error and also gave and error after 20 reqyests, it can be seen in the next Image
 
 ![Image of testing CORS Enabled and Rate limiting on a local react project in which I sent 100 requests using setTimeOut, it didn't gave any CORS error and also gave and error after 20 reqyests, it can be seen in the next Image](public/images/valents1.png)
 

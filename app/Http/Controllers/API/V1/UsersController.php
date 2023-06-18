@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UsersController extends Controller
 {
@@ -43,6 +46,8 @@ class UsersController extends Controller
             $data = $validated->validated();
 
             $user = User::where('email', $data['email'])->first();
+
+            // if email not found
             if (!$user) {
                 return response()->json([
                     'status' => 400,
@@ -52,9 +57,12 @@ class UsersController extends Controller
 
             if (Hash::check($data['password'], $user->password)) {
 
-                \Auth::login($user);
+                Auth::login($user);
+
+                $user = Auth::user();
+
                 $token = $user->createToken(config('app.name'))->accessToken;
-                // dd($token);
+
 
                 return response()->json([
                     'status' => 200,
@@ -63,14 +71,14 @@ class UsersController extends Controller
                         'user' => $user,
                         'token' => $token,
                     ]
-                ]);
+                ], 200);
 
             } else {
 
                 return response()->json([
                     'status' => 401,
                     'message' => 'Password Incorrect!',
-                ]);
+                ], 401);
             }
 
 
@@ -79,7 +87,7 @@ class UsersController extends Controller
             return response()->json([
                 'status' => 400,
                 'message' => $e->getMessage(),
-            ]);
+            ], 400);
         }
 
     }
@@ -93,19 +101,19 @@ class UsersController extends Controller
         try {
 
             $users = User::get();
-
+            // dd(auth()->user());
             return response()->json([
                 'status' => 200,
                 'message' => 'Users fetched successfuly!',
                 'data' => $users
-            ]);
+            ], 200);
 
         } catch (\Exception $e) {
 
             return response()->json([
                 'status' => 400,
                 'message' => $e->getMessage(),
-            ]);
+            ], 400);
         }
 
     }
@@ -123,20 +131,21 @@ class UsersController extends Controller
             'first_name' => 'required|string',
             'last_name' => 'string',
             'email' => 'required|unique:users',
-            'password' => 'required|unique:users|confirmation',
-            'photo' => 'sometimes',
+            'password' => 'required|unique:users|confirmed',
+            'password_confirmation' => 'required',
         ]);
 
         if ($validated->fails()) {
             return response()->json([
                 'status' => 400,
                 'message' => $validated->errors()
-            ]);
+            ], 400);
         }
         try {
 
             $data = $validated->validated();
-            $data['password'] = Hash::make($request->password);
+
+            $data['password'] = Hash::make($data['password']);
 
             // DB will rollback in case of any error occurs, useful when multiple
             // transactions are performed
@@ -144,6 +153,11 @@ class UsersController extends Controller
             DB::beginTransaction();
 
             $user = User::create($data);
+
+            // this function will use spatie media library and attach a new image if the photo is available in request
+            if ($request->file('photo')) {
+                Helpers::attachImage($user, $request->photo, 'photo');
+            }
 
             DB::commit();
 
@@ -160,7 +174,7 @@ class UsersController extends Controller
             return response()->json([
                 'status' => 400,
                 'message' => $e->getMessage(),
-            ]);
+            ], 400);
         }
 
     }
@@ -175,29 +189,47 @@ class UsersController extends Controller
 
     public function update(Request $request, $id)
     {
+        // dd($request->toArray(), $id);
         $validated = \Validator::make($request->toArray(), [
             'first_name' => 'string',
             'last_name' => 'string',
-            'email' => 'required|unique:users',
-            'password' => 'required|unique:users',
-            'photo' => 'sometimes',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($id)
+            ],
+            'password' => 'required|confirmed',
+            'password_confirmation' => 'required',
         ]);
 
         if ($validated->fails()) {
             return response()->json([
                 'status' => 400,
                 'message' => $validated->errors()
-            ]);
+            ], 400);
         }
 
         try {
 
             // DB will rollback in case of any error occurs, useful when multiple
             // transactions are performed
+            $data = $validated->validated();
+
+            $data['password'] = Hash::make($data['password']);
 
             DB::beginTransaction();
 
-            $user = User::find($id)->update($validated);
+            $user = User::find($id)->update($data);
+
+            $user = User::find($id)->first();
+
+            // this function will use spatie media library and delete the previous attached image
+            Helpers::deletePrevImage($user, 'photo');
+
+            // this function will use spatie media library and attach a new image if the photo is available in request
+            if ($request->file('photo')) {
+                Helpers::attachImage($user, $request->photo, 'photo');
+            }
 
             DB::commit();
 
@@ -205,7 +237,7 @@ class UsersController extends Controller
                 'status' => 200,
                 'message' => 'User updated successfuly!',
                 'data' => $user
-            ]);
+            ], 200);
 
         } catch (\Exception $e) {
 
@@ -214,7 +246,7 @@ class UsersController extends Controller
             return response()->json([
                 'status' => 400,
                 'message' => $e->getMessage(),
-            ]);
+            ], 404);
         }
 
     }
@@ -234,14 +266,26 @@ class UsersController extends Controller
 
             DB::beginTransaction();
 
-            User::find($id)->delete();
+            $user = User::find($id);
+
+            // if the :id is not correct throe err
+            if (!$user)
+
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'User not found!',
+                ]);
+
+            // else delete the user
+            if ($user)
+                $user->delete();
 
             DB::commit();
 
             return response()->json([
                 'status' => 204,
                 'message' => 'User deleted successfuly!',
-            ]);
+            ], 204);
 
         } catch (\Exception $e) {
 
@@ -250,21 +294,28 @@ class UsersController extends Controller
             return response()->json([
                 'status' => 400,
                 'message' => $e->getMessage(),
-            ]);
+            ], 400);
         }
 
     }
-    public function generateToken(Request $request)
+    public function logout(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        try {
 
-        if (\Auth::attempt($credentials)) {
-            $user = \Auth::user();
-            $token = $user->createToken('API Access Token')->accessToken;
+            Auth::user()->OauthAcessToken()->delete();
 
-            return response()->json(['access_token' => $token]);
+            return response()->json([
+                'status' => 204,
+                'message' => 'Logged out successfully!',
+            ], 200);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status' => 400,
+                'message' => $e->getMessage(),
+            ], 400);
         }
 
-        return response()->json(['error' => 'Invalid credentials'], 401);
     }
 }

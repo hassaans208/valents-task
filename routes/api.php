@@ -18,21 +18,23 @@ use App\Http\Controllers\API\V1\UsersController;
 
 Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
 
+    // Unathenticated Route
     Route::post('/login', [UsersController::class, 'login']);
 
-    // Unathenticated Route
     Route::get('/users', [UsersController::class, 'index']);
 
     // Authenticate Routes
     Route::group([
-        'middleware' => 'auth'
+        // 'middleware' => 'auth'
     ], function () {
 
         Route::post('/user/store', [UsersController::class, 'store']);
 
-        Route::put('/user/{id}/update', [UsersController::class, 'update']);
+        Route::post('/user/{id}/update', [UsersController::class, 'update']);
 
         Route::delete('/user/{id}/delete', [UsersController::class, 'delete']);
 
-    })->middleware('auth.session');
+        Route::post('/logout', [UsersController::class, 'logout']);
+
+    });
 });

@@ -285,7 +285,7 @@ class UsersController extends Controller
             return response()->json([
                 'status' => 204,
                 'message' => 'User deleted successfuly!',
-            ], 204);
+            ]);
 
         } catch (\Exception $e) {
 
@@ -302,12 +302,12 @@ class UsersController extends Controller
     {
         try {
 
-            Auth::user()->OauthAcessToken()->delete();
+            Auth::user()->token()->revoke();
 
             return response()->json([
                 'status' => 204,
                 'message' => 'Logged out successfully!',
-            ], 200);
+            ]);
 
         } catch (\Exception $e) {
 

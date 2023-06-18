@@ -5,28 +5,17 @@ use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\UsersController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
+// api version one routes implemented and tested
 Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
 
-    // Unathenticated Route
+    // created this route so the tester could authenticate and test the routes
     Route::post('/login', [UsersController::class, 'login']);
 
+    // Unathenticated Route
     Route::get('/users', [UsersController::class, 'index']);
 
-    // Authenticate Routes
-    Route::group([
-        // 'middleware' => 'auth'
-    ], function () {
+    // Authenticated Routes
+    Route::group(['middleware' => 'auth:api'], function () {
 
         Route::post('/user/store', [UsersController::class, 'store']);
 
@@ -34,6 +23,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
 
         Route::delete('/user/{id}/delete', [UsersController::class, 'delete']);
 
+        // created this route so the tester could logout and test other users
         Route::post('/logout', [UsersController::class, 'logout']);
 
     });

@@ -4,12 +4,13 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\UsersController;
+use App\Http\Controllers\API\V1\AuthenticationController;
 
 // api version one routes implemented and tested
 Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
 
     // created this route so the tester could authenticate and test the routes
-    Route::post('/login', [UsersController::class, 'login']);
+    Route::post('/login', [AuthenticationController::class, 'login']);
 
     // Unathenticated Route
     Route::get('/users', [UsersController::class, 'index']);
@@ -24,7 +25,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
         Route::delete('/user/{id}/delete', [UsersController::class, 'delete']);
 
         // created this route so the tester could logout and test other users
-        Route::post('/logout', [UsersController::class, 'logout']);
+        Route::post('/logout', [AuthenticationController::class, 'logout']);
 
     });
 });

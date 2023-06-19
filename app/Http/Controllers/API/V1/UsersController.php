@@ -13,84 +13,6 @@ use Illuminate\Validation\Rule;
 
 class UsersController extends Controller
 {
-
-    /**
-     * Retrieve a list of users.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function login(Request $request)
-    {
-        // $emails = User::get()->pluck('email')->toArray();
-
-        $validated = \Validator::make($request->toArray(), [
-
-            'email' => 'required',
-            'password' => 'required',
-
-        ], [
-
-            'email.in' => 'Email not found'
-
-        ]);
-
-        if ($validated->fails()) {
-            return response()->json([
-                'status' => 400,
-                'message' => $validated->errors()
-            ]);
-        }
-
-        try {
-
-            $data = $validated->validated();
-
-            $user = User::where('email', $data['email'])->first();
-
-            // if email not found
-            if (!$user) {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'User not found'
-                ]);
-            }
-
-            if (Hash::check($data['password'], $user->password)) {
-
-                Auth::login($user);
-
-                $user = Auth::user();
-
-                $token = $user->createToken(config('app.name'))->accessToken;
-
-
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'User loggedIn successfuly!',
-                    'data' => [
-                        'user' => $user,
-                        'token' => $token,
-                    ]
-                ], 200);
-
-            } else {
-
-                return response()->json([
-                    'status' => 401,
-                    'message' => 'Password Incorrect!',
-                ], 401);
-            }
-
-
-        } catch (\Exception $e) {
-
-            return response()->json([
-                'status' => 400,
-                'message' => $e->getMessage(),
-            ], 400);
-        }
-
-    }
     /**
      * Retrieve a list of users.
      *
@@ -219,17 +141,26 @@ class UsersController extends Controller
 
             DB::beginTransaction();
 
-            $user = User::find($id)->update($data);
+            $user = User::find($id);
 
-            $user = User::find($id)->first();
+            if(!$user){
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'User not found!',
+                ], 404);
+            }
+
+            $user->update($data);
 
             // this function will use spatie media library and delete the previous attached image
-            Helpers::deletePrevImage($user, 'photo');
 
             // this function will use spatie media library and attach a new image if the photo is available in request
             if ($request->file('photo')) {
+                Helpers::deletePrevImage($user, 'photo');
                 Helpers::attachImage($user, $request->photo, 'photo');
             }
+
+            $user = User::find($id);
 
             DB::commit();
 
@@ -290,26 +221,6 @@ class UsersController extends Controller
         } catch (\Exception $e) {
 
             DB::rollBack();
-
-            return response()->json([
-                'status' => 400,
-                'message' => $e->getMessage(),
-            ], 400);
-        }
-
-    }
-    public function logout(Request $request)
-    {
-        try {
-
-            Auth::user()->token()->revoke();
-
-            return response()->json([
-                'status' => 204,
-                'message' => 'Logged out successfully!',
-            ]);
-
-        } catch (\Exception $e) {
 
             return response()->json([
                 'status' => 400,

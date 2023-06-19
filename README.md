@@ -5,6 +5,9 @@ Please Have a look at:
 Postman Documentation
 </a>
 
+
+Base URL: http://localhost:8000/api/v1/
+
 ### Tasks Accomplished:
 <ul>
 <li>
@@ -74,6 +77,11 @@ Image of testing CORS Enabled and Rate limiting on a local react project is give
 Finally the console of this test is attached
 
 ![](public/images/valents2.png)
+
+Cors testing with: https://myxml.in/cors-tester.html
+
+![](public/images/valents3.png)
+
 
 ## Installation
 

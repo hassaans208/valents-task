@@ -82,7 +82,6 @@ Cors testing with: https://myxml.in/cors-tester.html
 
 ![](public/images/valents3.png)
 
-
 ## Installation
 
 <hr />

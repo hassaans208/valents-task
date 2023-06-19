@@ -80,7 +80,7 @@ Finally the console of this test is attached
 
 Cors testing with: https://myxml.in/cors-tester.html
 
-![](public/images/valent3.png)
+![](public/images/valent3.PNG)
 
 ## Installation
 
